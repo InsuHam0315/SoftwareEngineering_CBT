@@ -1,7 +1,7 @@
 # PROJECT_STATUS
 
 ## 현재 단계
-- **CBT 중심 개념 정리 페이지 상세 보강 및 로컬 검증 완료**
+- **CBT 중심 개념 정리 페이지 상세 보강·검증·GitHub main 푸시 완료**
 - 최종 갱신: 2026-06-21 (Asia/Seoul)
 - 정식 사이트 제목: `2026 소프트웨어공학 기말고사 CBT 문제집`
 - 대상 저장소: `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
@@ -93,16 +93,15 @@
 - GitHub Pages 배포 완료 여부와 실제 원격 환경의 오답노트/localStorage 동작은 푸시 후 브라우저에서 최종 확인해야 한다.
 
 ## 다음 action to resume
-1. 최종 검증 재실행
-2. `git status`와 staged 파일에서 원본 자료 제외 확인
-3. `Improve Software Engineering CBT study pages` 커밋
-4. `origin/main` 푸시
-5. 커밋 해시·푸시 결과를 이 문서에 기록
-6. GitHub Pages를 `main` / `/ (root)`로 설정하고 배포 URL 확인
+1. GitHub Pages를 `main` / `/ (root)`로 설정
+2. `https://insuham0315.github.io/SoftwareEngineering_CBT/` 배포 완료 확인
+3. 배포 환경에서 개념 카드 이미지·오른쪽 목차·모바일 목차 확인
+4. 로그인 후 CBT 응시 기록·오답노트 localStorage 연동 브라우저 확인
 
 ## Git 상태
 - 브랜치: `main`
 - origin: `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
-- 기존 기준 커밋: `7d5bd4e Build SoftwareEngineering CBT site`
-- 이번 개선 커밋: 커밋 전
-- 푸시 상태: 최종 검증 후 진행 예정
+- 개선 전 기준 커밋: `fe7cb5c Update project status after push`
+- 이번 개선 커밋: `fc6cafa Improve Software Engineering CBT study pages`
+- 푸시 상태: **성공** — `origin/main`에 `fc6cafa` 반영 완료
+- 남은 GitHub 설정: Repository → Settings → Pages → Deploy from a branch → `main` → `/ (root)`
