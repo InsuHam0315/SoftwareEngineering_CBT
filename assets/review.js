@@ -15,6 +15,8 @@
         "final-set-01": "software_engineering_final_set_01.html", "final-set-02": "software_engineering_final_set_02.html",
         "final-set-03": "software_engineering_final_set_03.html", "final-set-04": "software_engineering_final_set_04.html",
         "final-set-05": "software_engineering_final_set_05.html", "final-set-06": "software_engineering_final_set_06.html",
+        "final-set-07": "software_engineering_final_set_07.html", "final-set-08": "software_engineering_final_set_08.html",
+        "final-set-09": "software_engineering_final_set_09.html", "final-set-10": "software_engineering_final_set_10.html",
         "final-random": "software_engineering_final_random.html"
       };
       const legacyPage = String(item.questionId).startsWith("mock01-") ? pages.mock01 : String(item.questionId).startsWith("mock02-") ? pages.mock02 : null;

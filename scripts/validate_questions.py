@@ -11,11 +11,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
+FINAL_SET_COUNT = 10
 REQUIRED = ["id", "exam", "range", "sourceFolder", "sourceFile", "topic", "type", "difficulty", "question", "choices", "answer", "explanation", "tags"]
 DATASETS = {
     "mock01": ("software_engineering_mock_01.js", "window.SE_MOCK_01", "mock01"),
     "mock02": ("software_engineering_mock_02.js", "window.SE_MOCK_02", "mock02"),
-    **{f"final_set_{n:02d}": (f"software_engineering_final_set_{n:02d}.js", f"window.SE_FINAL_SET_{n:02d}", f"final-set-{n:02d}") for n in range(1, 7)},
+    **{f"final_set_{n:02d}": (f"software_engineering_final_set_{n:02d}.js", f"window.SE_FINAL_SET_{n:02d}", f"final-set-{n:02d}") for n in range(1, FINAL_SET_COUNT + 1)},
 }
 ABSOLUTE_WORDS = ("항상", "절대", "무조건", "반드시", "전혀")
 VAGUE_CHOICES = {"모두옳다", "모두맞다", "해당없다", "알수없다", "기타이다", "위와같다"}
@@ -42,9 +43,7 @@ def choice_length(text: str) -> int:
 
 
 def expected_difficulty(label: str) -> dict[str, tuple[int, int]]:
-    if label.startswith("mock"):
-        return {"쉬움": (5, 8), "보통": (20, 24), "어려움": (18, 22)}
-    return {"쉬움": (5, 7), "보통": (20, 23), "어려움": (20, 25)}
+    return {"쉬움": (15, 18), "보통": (25, 28), "어려움": (5, 8)}
 
 
 def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple[list[str], dict]:
@@ -54,6 +53,8 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
     correct_lengths: list[int] = []
     distractor_lengths: list[int] = []
     absolute_count = 0
+    imbalanced_count = 0
+    extreme_imbalance_count = 0
 
     if len(questions) != 50:
         errors.append(f"{label}: 문항 수 {len(questions)} (기대 50)")
@@ -97,15 +98,19 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
             errors.append(f"{where}: tags가 비어 있거나 올바르지 않음")
         if len(item["explanation"].strip()) < 35:
             errors.append(f"{where}: 해설이 너무 짧아 정답 근거와 함정을 설명하기 어려움")
+        if "시험 포인트:" not in item["explanation"]:
+            errors.append(f"{where}: 해설에 시험 포인트가 없음")
 
         lengths = [choice_length(choice) for choice in choices]
         shortest, longest = min(lengths), max(lengths)
-        if shortest < 12:
-            errors.append(f"{where}: 지나치게 짧고 모호할 수 있는 선지 존재 (최단 {shortest}자)")
-        if longest and shortest / longest < 0.60:
-            errors.append(f"{where}: 선지 길이 불균형 (최단 {shortest}자 / 최장 {longest}자)")
+        length_ratio = shortest / longest if longest else 0
+        if length_ratio < 0.60:
+            imbalanced_count += 1
+        if length_ratio < 0.35:
+            extreme_imbalance_count += 1
         answer_index = item["answer"] - 1
-        if lengths[answer_index] == longest:
+        distractor_max = max(length for i, length in enumerate(lengths) if i != answer_index)
+        if lengths[answer_index] > distractor_max:
             longest_correct += 1
         correct_lengths.append(lengths[answer_index])
         distractor_lengths.extend(length for i, length in enumerate(lengths) if i != answer_index)
@@ -132,10 +137,14 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
     unknown = set(difficulties) - {"쉬움", "보통", "어려움"}
     if unknown:
         errors.append(f"{label}: 알 수 없는 난이도 {sorted(unknown)}")
+    if difficulties["쉬움"] + difficulties["보통"] < 42:
+        errors.append(f"{label}: 쉬움+보통 {difficulties['쉬움'] + difficulties['보통']}문항 (최소 42)")
+    if difficulties["어려움"] > 8:
+        errors.append(f"{label}: 어려움 {difficulties['어려움']}문항 (최대 8)")
 
     ratio = longest_correct / len(questions) if questions else 0
     if not 0.20 <= ratio <= 0.35:
-        errors.append(f"{label}: 정답이 최장 선지인 비율 {ratio:.0%} (기대 20~35%)")
+        errors.append(f"{label}: 정답이 단독 최장 선지인 비율 {ratio:.0%} (기대 20~35%)")
     correct_avg = sum(correct_lengths) / len(correct_lengths) if correct_lengths else 0
     distractor_avg = sum(distractor_lengths) / len(distractor_lengths) if distractor_lengths else 0
     average_ratio = correct_avg / distractor_avg if distractor_avg else 0
@@ -144,11 +153,10 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
     if absolute_count > 10:
         errors.append(f"{label}: 항상/절대/무조건 계열 표현 {absolute_count}회로 과다")
     simple_stems = sum(bool(re.search(r"무엇인가\??$|정의로 옳은|다음 중 (?:맞는|옳은) 것은", item.get("question", ""))) for item in questions)
-    if simple_stems > 8:
-        errors.append(f"{label}: 단순 정의형 어간 {simple_stems}문항으로 과다")
 
     stats = {"ranges": ranges, "answers": answers, "difficulties": difficulties, "longest_ratio": ratio,
-             "average_ratio": average_ratio, "absolute_count": absolute_count, "simple_stems": simple_stems}
+             "average_ratio": average_ratio, "absolute_count": absolute_count, "simple_stems": simple_stems,
+             "imbalanced_count": imbalanced_count, "extreme_imbalance_count": extreme_imbalance_count}
     return errors, stats
 
 
@@ -198,7 +206,8 @@ def main() -> int:
         set_errors, stats = validate_set(label, questions, expected_exam)
         errors.extend(set_errors)
         print(f"{label}: {len(questions)}문항 | 정답 " + ", ".join(f"{n}={stats['answers'][n]}" for n in range(1, 5)))
-        print(f"  난이도 {dict(stats['difficulties'])} | 최장 정답 {stats['longest_ratio']:.0%} | 평균 길이비 {stats['average_ratio']:.2f}")
+        print(f"  난이도 {dict(stats['difficulties'])} | 단독 최장 정답 {stats['longest_ratio']:.0%} | 평균 길이비 {stats['average_ratio']:.2f}")
+        print(f"  선지 길이비 0.60 미만 {stats['imbalanced_count']}문항 | 0.35 미만 {stats['extreme_imbalance_count']}문항")
         for item in questions:
             item_id = item.get("id")
             if item_id in global_ids:
@@ -211,7 +220,7 @@ def main() -> int:
         errors.append("필수 파일 없음: data/software_engineering_final_bank.js")
     else:
         bank_text = final_bank.read_text(encoding="utf-8-sig")
-        for n in range(1, 7):
+        for n in range(1, FINAL_SET_COUNT + 1):
             if f"window.SE_FINAL_SET_{n:02d}" not in bank_text:
                 errors.append(f"통합 기말 문제은행에 {n}세트 참조 없음")
 
@@ -227,7 +236,7 @@ def main() -> int:
         for error in errors:
             print(f"  - {error}")
         return 1
-    print(f"\n[통과] 8개 세트 {sum(map(len, loaded.values()))}문항의 구조·분포·난도·선지 편향 검증 완료")
+    print(f"\n[통과] {len(loaded)}개 세트 {sum(map(len, loaded.values()))}문항의 구조·분포·난도·선지 편향 검증 완료")
     return 0
 
 

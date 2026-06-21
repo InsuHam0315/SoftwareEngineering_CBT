@@ -21,6 +21,10 @@
       "final-set-04": { data: window.SE_FINAL_SET_04, label: "기말 CBT 4세트" },
       "final-set-05": { data: window.SE_FINAL_SET_05, label: "기말 CBT 5세트" },
       "final-set-06": { data: window.SE_FINAL_SET_06, label: "기말 CBT 6세트" },
+      "final-set-07": { data: window.SE_FINAL_SET_07, label: "기말 CBT 7세트" },
+      "final-set-08": { data: window.SE_FINAL_SET_08, label: "기말 CBT 8세트" },
+      "final-set-09": { data: window.SE_FINAL_SET_09, label: "기말 CBT 9세트" },
+      "final-set-10": { data: window.SE_FINAL_SET_10, label: "기말 CBT 10세트" },
       "final-random": { data: window.SE_FINAL_BANK, label: "기말 CBT 랜덤 50문항", random: true }
     };
     const config = configs[bankName];
