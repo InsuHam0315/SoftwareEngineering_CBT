@@ -23,7 +23,7 @@ REQUIRED = HTML_FILES + [
     "assets/img/sdlc-flow.svg", "assets/img/scrum-flow.svg", "assets/img/uml-relations.svg", "assets/img/testing-flow.svg",
     "data/software_engineering_mock_01.js", "data/software_engineering_mock_02.js", "data/software_engineering_final_bank.js",
     "data/software_engineering_notes.js", "data/software_engineering_concepts.js", "data/software_engineering_comparisons.js",
-    "scripts/validate_questions.py", "scripts/validate_site.py",
+    "scripts/validate_questions.py", "scripts/validate_site.py", "scripts/generate_concept_svgs.py",
 ]
 GLOBALS = {
     "data/software_engineering_mock_01.js": "window.SE_MOCK_01",
@@ -34,6 +34,11 @@ GLOBALS = {
     "data/software_engineering_comparisons.js": "window.SE_COMPARISONS",
 }
 PROHIBITED_TRACKED_PREFIXES = ("시험/", "중간고사/", "기말고사/", "최종/", ".reference-tmp/", "linuxmaster-quiz/", "ComputerNetwork_CBT/")
+VISUAL_DATA = {
+    "data/software_engineering_notes.js": 38,
+    "data/software_engineering_concepts.js": 78,
+    "data/software_engineering_comparisons.js": 16,
+}
 
 
 class RefParser(HTMLParser):
@@ -89,6 +94,52 @@ def check_git(errors: list[str]) -> None:
     if bad: errors.append(f"추적되면 안 되는 원본/참고 파일: {bad[:20]}")
 
 
+def check_study_visuals(errors: list[str]) -> None:
+    image_dir = ROOT / "assets/img/concepts"
+    if not image_dir.is_dir():
+        errors.append("assets/img/concepts/ 폴더 없음")
+        return
+    concept_images = sorted(path for path in image_dir.iterdir() if path.is_file())
+    if not concept_images: errors.append("assets/img/concepts/에 시각자료가 없음")
+    for path in concept_images:
+        relative = path.relative_to(ROOT).as_posix()
+        if path.suffix.lower() == ".svg":
+            try:
+                tree = ET.parse(path)
+                for node in tree.iter():
+                    for key, value in node.attrib.items():
+                        if key.endswith("href") and re.match(r"^(?:https?:)?//", value, re.I):
+                            errors.append(f"{relative}: 외부 SVG 이미지 참조")
+            except ET.ParseError as exc: errors.append(f"{relative}: SVG XML 오류 {exc}")
+    page_dir = ROOT / "notes/software-engineering-final"
+    for relative, expected_count in VISUAL_DATA.items():
+        path = ROOT / relative
+        if not path.exists(): continue
+        text = path.read_text(encoding="utf-8-sig")
+        blocks = re.findall(r"[\"']?visual[\"']?\s*:\s*\{(.*?)\}", text, re.S)
+        if len(blocks) != expected_count:
+            errors.append(f"{relative}: visual 항목 {len(blocks)}개 (기대 {expected_count}개)")
+        if len(re.findall(r"[\"']?fullExplanation[\"']?\s*:", text)) != expected_count:
+            errors.append(f"{relative}: fullExplanation 항목이 전체 {expected_count}개에 없음")
+        if len(re.findall(r"[\"']?sourceBasis[\"']?\s*:", text)) != expected_count:
+            errors.append(f"{relative}: sourceBasis 항목이 전체 {expected_count}개에 없음")
+        for index, block in enumerate(blocks, start=1):
+            match = re.search(r"[\"']?src[\"']?\s*:\s*['\"]([^'\"]+)['\"]", block)
+            if not match:
+                errors.append(f"{relative}: visual #{index}에 src 없음")
+                continue
+            raw = match.group(1)
+            if re.match(r"^(?:https?:)?//", raw, re.I):
+                errors.append(f"{relative}: 외부 이미지 핫링크 '{raw}'")
+                continue
+            target = (page_dir / unquote(urlsplit(raw).path)).resolve()
+            try: target.relative_to(ROOT.resolve())
+            except ValueError:
+                errors.append(f"{relative}: 프로젝트 밖 visual 경로 '{raw}'")
+                continue
+            if not target.is_file(): errors.append(f"{relative}: 존재하지 않는 visual 경로 '{raw}'")
+
+
 def main() -> int:
     errors: list[str] = []
     for relative in REQUIRED:
@@ -142,15 +193,21 @@ def main() -> int:
     for marker in ["https://insuham0315.github.io/SoftwareEngineering_CBT/", "ist-se.kro.kr", "python -m http.server 8000"]:
         if marker not in readme: errors.append(f"README.md: 필수 안내 없음 '{marker}'")
     gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8-sig") if (ROOT / ".gitignore").exists() else ""
-    for marker in ["/시험/", "/최종/", "/.reference-tmp/"]:
+    for marker in ["/시험/", "/중간고사/", "/기말고사/", "/최종/", "/.reference-tmp/", "/_reference/", "/reference/", "/tmp/", "/temp/", "*.tmp"]:
         if marker not in gitignore: errors.append(f".gitignore: 제외 규칙 없음 '{marker}'")
-    check_manifest(errors); check_git(errors)
+    notes_page = (ROOT / "notes/software-engineering-final/index.html").read_text(encoding="utf-8-sig") if (ROOT / "notes/software-engineering-final/index.html").exists() else ""
+    if not re.search(r'id=["\']study-toc["\']', notes_page): errors.append("개념정리 페이지: study-toc 목차 마크업 없음")
+    notes_js = (ROOT / "assets/notes.js").read_text(encoding="utf-8-sig") if (ROOT / "assets/notes.js").exists() else ""
+    for marker in ["IntersectionObserver", "fullExplanation", "commonMistakes", "oxPoints", "visual"]:
+        if marker not in notes_js: errors.append(f"assets/notes.js: 상세 카드/목차 기능 표식 없음 '{marker}'")
+    check_study_visuals(errors); check_manifest(errors); check_git(errors)
     if errors:
         print(f"[실패] 사이트 검증 오류 {len(errors)}건")
         for error in errors: print(f"  - {error}")
         return 1
     print(f"[통과] 필수 파일 {len(REQUIRED)}개와 정식 HTML {len(HTML_FILES)}개 확인")
     print("[통과] GitHub Pages 상대경로·로컬 이미지·SVG·전역 데이터 확인")
+    print("[통과] 학습 카드별 로컬 visual·오른쪽 목차·상세 렌더링 표식 확인")
     print("[통과] 새 localStorage 키·CBT 확인 채점·랜덤·필터 기능 표식 확인")
     print("[통과] 참고 저장소 파일이 산출물에 포함되지 않음")
     return 0

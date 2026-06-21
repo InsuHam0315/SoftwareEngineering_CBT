@@ -17,8 +17,12 @@
 /linuxmaster-quiz/
 /ComputerNetwork_CBT/
 /_references/
+/_reference/
+/reference/
 /.tmp/
 /tmp/
+/temp/
+*.tmp
 
 # 이번 개편 전의 레거시 진입점과 중복 파일
 /compare.html
