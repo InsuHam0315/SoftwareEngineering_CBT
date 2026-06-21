@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 HTML_FILES = [
     "index.html", "login.html",
     "cbt/software_engineering_mock_01.html", "cbt/software_engineering_mock_02.html", "cbt/software_engineering_final_cbt.html",
+    *[f"cbt/software_engineering_final_set_{n:02d}.html" for n in range(1, 7)],
+    "cbt/software_engineering_final_random.html",
     "notes/software-engineering-final/index.html", "review/wrong-notes.html", "stats/study-record.html",
 ]
 REQUIRED = HTML_FILES + [
@@ -22,6 +24,7 @@ REQUIRED = HTML_FILES + [
     "assets/style.css", "assets/storage.js", "assets/auth.js", "assets/cbt.js", "assets/review.js", "assets/stats.js", "assets/notes.js",
     "assets/img/sdlc-flow.svg", "assets/img/scrum-flow.svg", "assets/img/uml-relations.svg", "assets/img/testing-flow.svg",
     "data/software_engineering_mock_01.js", "data/software_engineering_mock_02.js", "data/software_engineering_final_bank.js",
+    *[f"data/software_engineering_final_set_{n:02d}.js" for n in range(1, 7)],
     "data/software_engineering_notes.js", "data/software_engineering_concepts.js", "data/software_engineering_comparisons.js",
     "scripts/validate_questions.py", "scripts/validate_site.py", "scripts/generate_concept_svgs.py",
 ]
@@ -29,6 +32,7 @@ GLOBALS = {
     "data/software_engineering_mock_01.js": "window.SE_MOCK_01",
     "data/software_engineering_mock_02.js": "window.SE_MOCK_02",
     "data/software_engineering_final_bank.js": "window.SE_FINAL_BANK",
+    **{f"data/software_engineering_final_set_{n:02d}.js": f"window.SE_FINAL_SET_{n:02d}" for n in range(1, 7)},
     "data/software_engineering_notes.js": "window.SE_NOTES",
     "data/software_engineering_concepts.js": "window.SE_CONCEPTS",
     "data/software_engineering_comparisons.js": "window.SE_COMPARISONS",
@@ -189,6 +193,23 @@ def main() -> int:
         if marker not in cbt: errors.append(f"assets/cbt.js: CBT 기능 표식 없음 '{marker}'")
     index = (ROOT / "index.html").read_text(encoding="utf-8-sig") if (ROOT / "index.html").exists() else ""
     if "2026 소프트웨어공학 기말고사 CBT 문제집" not in index: errors.append("index.html: 정확한 사이트 제목 없음")
+    for n in range(1, 7):
+        link = f"cbt/software_engineering_final_set_{n:02d}.html"
+        if link not in index: errors.append(f"index.html: 기말 CBT {n}세트 링크 없음")
+    if "cbt/software_engineering_final_random.html" not in index: errors.append("index.html: 랜덤 50문항 링크 없음")
+    selector = (ROOT / "cbt/software_engineering_final_cbt.html").read_text(encoding="utf-8-sig") if (ROOT / "cbt/software_engineering_final_cbt.html").exists() else ""
+    for n in range(1, 7):
+        link = f"software_engineering_final_set_{n:02d}.html"
+        if link not in selector: errors.append(f"기말 세트 선택 페이지: {n}세트 링크 없음")
+        set_page = (ROOT / "cbt" / link).read_text(encoding="utf-8-sig") if (ROOT / "cbt" / link).exists() else ""
+        if f'data-bank="final-set-{n:02d}"' not in set_page: errors.append(f"기말 CBT {n}세트: data-bank 설정 오류")
+        if f"software_engineering_final_set_{n:02d}.js" not in set_page: errors.append(f"기말 CBT {n}세트: 데이터 파일 연결 없음")
+    random_page = (ROOT / "cbt/software_engineering_final_random.html").read_text(encoding="utf-8-sig") if (ROOT / "cbt/software_engineering_final_random.html").exists() else ""
+    if 'data-bank="final-random"' not in random_page: errors.append("랜덤 50문항 페이지: data-bank 설정 오류")
+    if 'id="cbt-app"' in selector or 'data-bank="finalbank"' in selector:
+        errors.append("기말 세트 선택 페이지가 이전 장문 CBT 세션으로 남아 있음")
+    if "100문항" in index or "100문항" in selector:
+        errors.append("기본 진입 화면에 이전 100문항 세션 안내가 남아 있음")
     readme = (ROOT / "README.md").read_text(encoding="utf-8-sig") if (ROOT / "README.md").exists() else ""
     for marker in ["https://insuham0315.github.io/SoftwareEngineering_CBT/", "ist-se.kro.kr", "python -m http.server 8000"]:
         if marker not in readme: errors.append(f"README.md: 필수 안내 없음 '{marker}'")

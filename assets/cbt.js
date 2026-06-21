@@ -11,14 +11,26 @@
   document.addEventListener("DOMContentLoaded", () => {
     const app = document.getElementById("cbt-app"); if (!app) return;
     const bankName = document.body.dataset.bank;
+    const retryId = new URLSearchParams(location.search).get("q");
     const configs = {
       mock01: { data: window.SE_MOCK_01, label: "모의고사 1회" },
       mock02: { data: window.SE_MOCK_02, label: "모의고사 2회" },
-      finalbank: { data: window.SE_FINAL_BANK, label: "기말 CBT 문제은행" }
+      "final-set-01": { data: window.SE_FINAL_SET_01, label: "기말 CBT 1세트" },
+      "final-set-02": { data: window.SE_FINAL_SET_02, label: "기말 CBT 2세트" },
+      "final-set-03": { data: window.SE_FINAL_SET_03, label: "기말 CBT 3세트" },
+      "final-set-04": { data: window.SE_FINAL_SET_04, label: "기말 CBT 4세트" },
+      "final-set-05": { data: window.SE_FINAL_SET_05, label: "기말 CBT 5세트" },
+      "final-set-06": { data: window.SE_FINAL_SET_06, label: "기말 CBT 6세트" },
+      "final-random": { data: window.SE_FINAL_BANK, label: "기말 CBT 랜덤 50문항", random: true }
     };
     const config = configs[bankName];
     if (!config || !Array.isArray(config.data) || !config.data.length) { app.innerHTML = '<div class="empty">문제 데이터를 불러오지 못했습니다.</div>'; return; }
-    const allSource = config.data.map((question) => ({ ...question }));
+    const retryQuestion = retryId ? config.data.find((question) => question.id === retryId) : null;
+    const randomSource = config.random ? [
+      ...(retryQuestion ? [retryQuestion] : []),
+      ...shuffle(config.data.filter((question) => question.id !== retryQuestion?.id)).slice(0, retryQuestion ? 49 : 50)
+    ] : config.data;
+    const allSource = randomSource.map((question) => ({ ...question }));
     let filteredSource = allSource.slice();
     let questions = filteredSource.map((question) => ({ ...question, displayChoices: choiceObjects(question) }));
     const states = new Map(); let savedSignature = "";
@@ -100,6 +112,6 @@
     document.getElementById("save-record").addEventListener("click", () => saveRecord(false));
     document.getElementById("apply-bank-filter")?.addEventListener("click", applyFilters);
     buildFilterOptions(); draw();
-    const retryId = new URLSearchParams(location.search).get("q"); if (retryId) setTimeout(() => document.getElementById(`q-${retryId}`)?.scrollIntoView({ behavior: "smooth" }), 120);
+    if (retryId) setTimeout(() => document.getElementById(`q-${retryId}`)?.scrollIntoView({ behavior: "smooth" }), 120);
   });
 }());

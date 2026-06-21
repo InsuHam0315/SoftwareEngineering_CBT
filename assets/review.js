@@ -10,7 +10,15 @@
       if (topics.includes(topicValue)) topic.value = topicValue; if (tags.includes(tagValue)) tag.value = tagValue;
     }
     function retryURL(item) {
-      const page = item.exam === "mock01" ? "software_engineering_mock_01.html" : item.exam === "mock02" ? "software_engineering_mock_02.html" : "software_engineering_final_cbt.html";
+      const pages = {
+        mock01: "software_engineering_mock_01.html", mock02: "software_engineering_mock_02.html",
+        "final-set-01": "software_engineering_final_set_01.html", "final-set-02": "software_engineering_final_set_02.html",
+        "final-set-03": "software_engineering_final_set_03.html", "final-set-04": "software_engineering_final_set_04.html",
+        "final-set-05": "software_engineering_final_set_05.html", "final-set-06": "software_engineering_final_set_06.html",
+        "final-random": "software_engineering_final_random.html"
+      };
+      const legacyPage = String(item.questionId).startsWith("mock01-") ? pages.mock01 : String(item.questionId).startsWith("mock02-") ? pages.mock02 : null;
+      const page = item.exam === "finalbank" && legacyPage ? legacyPage : pages[item.exam] || "software_engineering_final_cbt.html";
       return `../cbt/${page}?q=${encodeURIComponent(item.questionId)}`;
     }
     function draw() {

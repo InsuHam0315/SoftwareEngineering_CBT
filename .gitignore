@@ -42,6 +42,7 @@
 /data/comparisons.js
 
 # 도구와 운영체제 캐시
+/.omx/
 __pycache__/
 *.py[cod]
 .DS_Store

@@ -1,132 +1,74 @@
 # PROJECT_STATUS
 
 ## 현재 단계
-- **개념 상세 화면 이미지 중심 레이아웃 개선 및 로컬 검증 완료**
+- **소프트웨어공학 CBT 문제은행 고도화 및 50문항 세트 구조 개편 완료**
 - 최종 갱신: 2026-06-21 (Asia/Seoul)
-- 정식 사이트 제목: `2026 소프트웨어공학 기말고사 CBT 문제집`
-- 대상 저장소: `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
+- 저장소: `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
 
-## 이번 개념 상세 레이아웃 개선
-- 기존 이미지·요약 2열 배치를 단일 열로 바꾸고, 제목 바로 아래에서 이미지가 상세 콘텐츠 폭을 사용하도록 개선
-- 이미지 영역을 어두운 카드형 hero로 확장하고 데스크톱 이미지는 최대 980px, 최소 높이 260px로 표시
-- 960×500 SVG의 모바일 가독성을 위해 이미지 전용 가로 스크롤 영역과 640px 최소 폭 적용
-- 이미지 캡션 다음에 청록색 강조선이 있는 `핵심 요약`을 배치하고, 기존 시험 포인트를 활용해 모든 요약을 2문장으로 구성
-- `상세 보기` 버튼을 핵심 요약 아래로 이동하고 모든 상세 설명을 기본 접힘으로 변경
-- 펼치면 `상세 닫기`, 다시 누르면 `상세 보기`로 바뀌며 `aria-expanded`와 `hidden` 상태가 함께 갱신됨
-- 기존 상세 설명, 중요성, 흐름, 예시, 시험 포인트, 실수, 연관 개념, 암기법, OX 내용은 삭제하지 않고 펼침 영역에 유지
+## 모의고사 개선 상태
+| 세트 | 문항 | 범위 | 난이도(쉬움/보통/어려움) | 정답 분포(1/2/3/4) | 정답 최장 비율 |
+|---|---:|---|---|---|---:|
+| 모의고사 1회 | 50 | 중간 15 / 기말 35 | 7 / 22 / 21 | 13 / 12 / 13 / 12 | 26% |
+| 모의고사 2회 | 50 | 중간 15 / 기말 35 | 7 / 22 / 21 | 12 / 13 / 12 / 13 | 26% |
 
-## 이번 수정 파일
-- `assets/notes.js`: 상세 카드 DOM 순서, 2문장 핵심 요약, 기본 접힘 및 토글 문구 개선
-- `assets/style.css`: 대형 이미지 hero, 요약 강조 카드, 데스크톱·모바일 반응형 스타일
-- `PROJECT_STATUS.md`: 변경 범위와 검증 결과 기록
+- 단순 정의형을 줄이고 사례 적용, 개념 비교, 흐름 판단, UML 관계, 테스트 설계, Verification/Validation, 스크럼, 품질보증·유지보수 판단형으로 재작성했다.
+- 네 선지의 문법·구체성·길이를 맞추고 각 오답에 개념상 그럴듯하지만 잘못된 조건이나 결과를 포함했다.
+- 모든 해설에 정답 근거와 대표 함정 반박을 포함했다.
 
-## 이번 검증 결과
-- `python scripts/validate_questions.py`: **통과**
-- `python scripts/validate_site.py`: **통과** — 원본 18개 SHA-256 무결성 포함
-- `node --check`: **통과** — `assets/notes.js`, `assets/cbt.js`, `assets/storage.js`, `assets/auth.js`
-- Chrome CDP 실제 렌더링: **통과**
-  - 학습노트 38개, 핵심 개념 78개, 비교 16개의 이미지와 기본 접힘 상태 확인
-  - 데스크톱 이미지 980px, 이미지 아래 요약, 요약 아래 토글 순서 확인
-  - `상세 보기` → `상세 닫기` → `상세 보기` 및 `aria-expanded`·`hidden` 동기화 확인
-  - 390px 모바일에서 페이지 자체 가로 넘침 없이 640px 다이어그램 내부 스크롤 확인
-- `git diff --check`: **통과**
+## 기말 CBT 세트 분할 상태
+- 이전 장문 기본 세션을 세트 선택 화면으로 전환했다.
+- 고정 세트 6개, 각 50문항으로 총 300문항을 구성했다.
+- 전체 300문항에서 원본 ID를 유지해 추출하는 `랜덤 50문항`을 추가했다.
 
-## 이번 보강 작업
-- 기존 사이트와 데이터 구조를 유지한 채 학습노트 38개, 개념사전 78개, 비교표 16개를 초보자·시험 대비용으로 확장
-- 각 항목에 요약, 상세 설명, 중요성, 흐름, 예시, 시험 포인트, 실수, 연관 개념, 암기법, OX, 태그, 내용 기준, 시각자료 메타데이터 추가
-- 중요 개념은 상세 설명 700자 이상, 일반 개념은 400자 이상이 되도록 점검
-- 제공 자료 밖 보충 설명에 `일반적인 소프트웨어공학 관점 보충` 표시
-- 관련 개념끼리 재사용할 수 있는 한국어 교육용 로컬 SVG 17개를 `assets/img/concepts/`에 생성
-- 외부 이미지 핫링크를 사용하지 않고 모든 카드 이미지를 GitHub Pages 상대경로로 연결
-- 데스크톱 오른쪽 sticky 목차, 모바일 접이식 목차, 부드러운 앵커 이동, 현재 섹션 강조 구현
-- 검색·시험 범위·자료 종류 변경 시 목차와 카드 목록이 함께 갱신되도록 구현
-- 카드에 범위/중요도/제목/출처/펼치기 버튼, 로컬 visual, 상세 학습 블록을 배치
-- 모든 상세 설명을 기본으로 접고 필요한 카드만 `상세 보기`로 열도록 탐색성을 유지
+| 세트 | 문항 | 난이도(쉬움/보통/어려움) | 정답 분포(1/2/3/4) | 정답 최장 비율 |
+|---|---:|---|---|---:|
+| 기말 CBT 1세트 | 50 | 6 / 22 / 22 | 13 / 13 / 12 / 12 | 26% |
+| 기말 CBT 2세트 | 50 | 6 / 22 / 22 | 12 / 13 / 12 / 13 | 26% |
+| 기말 CBT 3세트 | 50 | 6 / 22 / 22 | 13 / 12 / 13 / 12 | 26% |
+| 기말 CBT 4세트 | 50 | 6 / 22 / 22 | 13 / 13 / 12 / 12 | 26% |
+| 기말 CBT 5세트 | 50 | 6 / 22 / 22 | 13 / 13 / 12 / 12 | 26% |
+| 기말 CBT 6세트 | 50 | 6 / 22 / 22 | 13 / 13 / 12 / 12 | 26% |
 
-## 추가한 시각자료
-- `program-software.svg`
-- `software-quality.svg`
-- `requirements.svg`
-- `sdlc-flow.svg`
-- `waterfall-model.svg`
-- `prototype-spiral.svg`
-- `incremental-iterative.svg`
-- `agile-scrum.svg`
-- `uml-diagrams.svg`
-- `uml-relations-detail.svg`
-- `planning-estimation.svg`
-- `function-point.svg`
-- `architecture-design.svg`
-- `design-patterns.svg`
-- `verification-validation.svg`
-- `testing-levels.svg`
-- `maintenance-types.svg`
+## 기능 보존 및 UI 변경
+- 기존 다크 UI, 로컬 로그인, 사용자별 학습기록, 오답노트, 확인 버튼 채점, 해설, 문제 번호 팔레트, 문제·선지 랜덤 섞기를 유지했다.
+- 기말 세트 선택 페이지, 6개 고정 세트 페이지, 랜덤 50문항 페이지를 추가했다.
+- 오답 다시 풀기 경로와 학습기록 집계를 새 세트 ID에 맞게 확장했다.
+- 과거 `finalbank` 오답 기록의 모의고사 재시도 경로도 보존했다.
 
-모든 신규 시각자료는 직접 생성한 로컬 SVG이다. 공개 라이선스를 신속히 검증할 수 있는 외부 이미지를 사용하지 못할 경우 로컬 SVG를 생성한다는 fallback 정책을 적용했으며, 외부 웹 이미지와 핫링크는 사용하지 않았다.
-
-## 수정/생성 파일
-- 학습 화면: `notes/software-engineering-final/index.html`
-- 학습 렌더링: `assets/notes.js`
-- 공통 스타일: `assets/style.css`
-- 학습 데이터: `data/software_engineering_notes.js`, `data/software_engineering_concepts.js`, `data/software_engineering_comparisons.js`
-- 신규 이미지: `assets/img/concepts/*.svg` 17개
-- SVG 생성 스크립트: `scripts/generate_concept_svgs.py`
-- 검증기: `scripts/validate_site.py`
-- Git 제외 규칙: `.gitignore`
-- 진행 문서: `PROJECT_STATUS.md`
+## 수정·생성 파일
+- 진입·문서: `index.html`, `README.md`, `.gitignore`, `PROJECT_STATUS.md`
+- CBT 화면: `cbt/software_engineering_final_cbt.html`, `cbt/software_engineering_final_set_01.html`~`06.html`, `cbt/software_engineering_final_random.html`
+- 문제 데이터: `data/software_engineering_mock_01.js`, `data/software_engineering_mock_02.js`, `data/software_engineering_final_set_01.js`~`06.js`, `data/software_engineering_final_bank.js`
+- 기능 JS: `assets/cbt.js`, `assets/storage.js`, `assets/review.js`, `assets/stats.js`
+- 기록 화면: `stats/study-record.html`
+- 검증기: `scripts/validate_questions.py`, `scripts/validate_site.py`
 
 ## 검증 결과
 - `python scripts/validate_questions.py`: **통과**
-  - mock01 50문항, mock02 50문항, 통합 문제은행 100문항
-  - 중간고사 30문항, 기말고사 70문항 유지
-  - 유사도 0.88 이상 중복 의심 없음
+  - 8개 세트, 총 400문항 구조·문항 수·난도·정답 분포·연속 정답·길이 편향 확인
+  - 완전 중복 0건, 문장 유사도 0.90 이상 0건
+  - 모든 세트 정답 최장 비율 26%, 평균 정답/오답 길이비 1.03~1.10
 - `python scripts/validate_site.py`: **통과**
-  - 필수 파일 32개와 정식 HTML 8개 확인
+  - 필수 파일 45개, 정식 HTML 15개, 상대경로와 데이터 전역변수 확인
   - 원본 18개 SHA-256 무결성 확인
-  - 카드별 local visual 132개, `assets/img/concepts/`, TOC, 상세 렌더링 표식 확인
-  - 외부 이미지 핫링크 없음, 로컬 이미지/SVG 경로와 XML 정상
-  - Git 추적 안전성, localStorage 키, CBT 기능 표식 정상
-- Node JS 구문 검사: **12개 모두 통과**
-  - `assets/auth.js`, `storage.js`, `cbt.js`, `notes.js`, `review.js`, `stats.js`
-  - 학습 데이터 3개, 모의고사 데이터 2개, 통합 문제은행 데이터 1개
-- Chrome CDP 실제 렌더링: **통과**
-  - 기본 학습노트 카드/이미지 38개, 접힌 상세 38개, 열린 상세 0개
-  - 핵심 개념 78개 및 비교 16개 전환 렌더링
-  - 이미지 → 핵심 요약 → 상세 토글 순서와 동적 목차 재생성
-  - 외부 이미지 0개, 데스크톱 오른쪽 목차 정상
-  - 390px 모바일 이미지 내부 가로 스크롤 및 페이지 자체 가로 넘침 없음
-- HTTP 정식 페이지 8개: **모두 200 응답**
+- `node --check`: **통과** — 기능·데이터 JS 17개
+- HTTP 확인: **통과** — 정식 화면 15개 모두 200 응답
 - `git diff --check`: **통과**
 
-## 기존 기능 보호
-- `assets/auth.js`, `assets/storage.js`, `assets/cbt.js` 변경 없음
-- `login.html`, `index.html` 변경 없음
-- `cbt/` 3개 HTML과 CBT 문제 데이터 변경 없음
-- `review/wrong-notes.html`, `stats/study-record.html` 변경 없음
-- 로그인, 사용자별 오답, 응시 기록에 쓰는 기존 localStorage 키 유지
-
 ## 원본 안전 상태
-- 실제 읽기 전용 원본 위치: `시험/중간고사/`, `시험/기말고사/`
-- 원본 폴더에 파일을 생성·수정·삭제·이동하지 않음
-- 원본 18개 파일이 `data/source_manifest.json`의 SHA-256 및 크기와 모두 일치
-- `.gitignore`에 `시험/`, `중간고사/`, `기말고사/`, 임시·참고 폴더 및 임시 파일 제외 규칙 유지
-
-## 알려진 제한사항
-- 연관된 세부 항목은 같은 주제 SVG를 재사용한다. 장식 이미지보다 판별 기준과 흐름을 보여 주는 학습용 그림을 우선했다.
-- 모바일에서는 SVG 내부 글자의 판독성을 위해 이미지 영역 안에서 의도적으로 가로 스크롤한다.
-- 브라우저 간 실제 영구 저장 데이터 마이그레이션은 변경하지 않았으며, 이번 작업은 기존 localStorage 구조를 그대로 유지한다.
-- GitHub Pages 배포 완료 여부와 실제 원격 환경의 오답노트/localStorage 동작은 푸시 후 브라우저에서 최종 확인해야 한다.
-
-## 다음 action to resume
-1. GitHub Pages를 `main` / `/ (root)`로 설정
-2. `https://insuham0315.github.io/SoftwareEngineering_CBT/` 배포 완료 확인
-3. 배포 환경에서 개념 카드 이미지·오른쪽 목차·모바일 목차 확인
-4. 로그인 후 CBT 응시 기록·오답노트 localStorage 연동 브라우저 확인
+- `시험/`, `중간고사/`, `기말고사/`, `최종/` 원본·기존 자료를 수정하거나 추적하지 않았다.
+- `.gitignore`에 원본, 참고, 임시, 운영체제 파일 제외 규칙을 유지·확인했다.
+- 생성 과정의 임시 스크립트는 모두 삭제했다.
 
 ## Git 상태
 - 브랜치: `main`
-- origin: `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
-- 이번 refinement 기준 커밋: `fc6cafa Improve Software Engineering CBT study pages`
-- 이번 레이아웃 개선: 로컬 작업 트리 반영, 커밋·푸시 미실행
-- 이전 푸시 상태: **성공** — `origin/main`에 `fc6cafa` 반영 완료
-- 남은 GitHub 설정: Repository → Settings → Pages → Deploy from a branch → `main` → `/ (root)`
+- 원격: `origin` → `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
+- 예정 커밋: `Improve Software Engineering CBT question bank`
+- 이 문서 작성 시점에는 전체 검증이 통과했으며, 허용된 산출물만 선택 스테이징한 뒤 커밋·푸시한다.
+
+## 중단 시 다음 재개 작업
+1. `python scripts/validate_questions.py`
+2. `python scripts/validate_site.py`
+3. `git status --short`와 스테이징 목록에서 원본 폴더가 없는지 확인
+4. 커밋 `Improve Software Engineering CBT question bank`
+5. `git push origin main`
