@@ -63,12 +63,10 @@
 ## Git 상태
 - 브랜치: `main`
 - 원격: `origin` → `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
-- 예정 커밋: `Improve Software Engineering CBT question bank`
-- 이 문서 작성 시점에는 전체 검증이 통과했으며, 허용된 산출물만 선택 스테이징한 뒤 커밋·푸시한다.
+- 문제은행 개선 커밋: `eb9c62c Improve Software Engineering CBT question bank`
+- Push: `origin/main` 반영 완료
+- 작업 트리: 커밋 직후 clean, 원본 폴더 추적 파일 0개
 
-## 중단 시 다음 재개 작업
-1. `python scripts/validate_questions.py`
-2. `python scripts/validate_site.py`
-3. `git status --short`와 스테이징 목록에서 원본 폴더가 없는지 확인
-4. 커밋 `Improve Software Engineering CBT question bank`
-5. `git push origin main`
+## 다음 확인 작업
+1. GitHub Pages 배포 완료 후 세트 선택·랜덤 50·오답 재시도 동작 확인
+2. 배포 브라우저에서 localStorage 로그인·기록 연동 최종 확인
