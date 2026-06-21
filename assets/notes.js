@@ -32,10 +32,19 @@
     }
 
     function summaryOf(item, selected) {
-      if (item.shortSummary) return item.shortSummary;
-      if (selected === "notes") return item.content || "";
-      if (selected === "concepts") return item.definition || "";
-      return item.keyDifference || "";
+      let summary;
+      if (item.shortSummary) summary = item.shortSummary;
+      else if (selected === "notes") summary = item.content || "";
+      else if (selected === "concepts") summary = item.definition || "";
+      else summary = item.keyDifference || "";
+
+      const sentenceCount = (String(summary).match(/[.!?](?:\s|$)/g) || []).length;
+      const examPoint = arrayOf(item.examPoint || item.examTip)[0];
+      if (sentenceCount < 2 && examPoint) {
+        const firstSentence = String(examPoint).trim().match(/^.*?[.!?](?:\s|$)/);
+        summary = `${summary} ${firstSentence ? firstSentence[0].trim() : examPoint}`;
+      }
+      return summary;
     }
 
     function sourceBasis(item) {
@@ -58,7 +67,7 @@
       const title = item.title || item.name || item.conceptA || "개념";
       const sourceName = visual.sourceName === "local generated SVG" ? "직접 제작한 로컬 SVG" : visual.sourceName;
       const caption = visual.caption || `${title} 핵심 구조`;
-      return `<figure class="study-visual"><img src="${e(src)}" alt="${e(visual.alt || `${title} 학습 다이어그램`)}" loading="lazy" decoding="async"><figcaption>${e(caption)}${sourceName ? `<span>${e(sourceName)}</span>` : ""}</figcaption></figure>`;
+      return `<figure class="study-visual concept-visual-hero"><div class="study-visual-scroll concept-visual-scroll"><img src="${e(src)}" alt="${e(visual.alt || `${title} 학습 다이어그램`)}" loading="lazy" decoding="async"></div><figcaption class="visual-caption">${e(caption)}${sourceName ? `<span>${e(sourceName)}</span>` : ""}</figcaption></figure>`;
     }
 
     function importanceBadge(value) {
@@ -91,7 +100,7 @@
       return `<div class="study-compare-pair"><div><span class="eyebrow">개념 A</span><strong>${e(item.conceptA)}</strong></div><span class="study-compare-vs" aria-hidden="true">비교</span><div><span class="eyebrow">개념 B</span><strong>${e(item.conceptB)}</strong></div></div>`;
     }
 
-    function cardHTML(item, selected, index) {
+    function cardHTML(item, selected) {
       const title = itemTitle(item, selected);
       const id = stableId(item, selected);
       const detailId = `${id}-detail`;
@@ -99,7 +108,6 @@
       const related = item.relatedConcepts || item.related;
       const example = item.concreteExample || item.example;
       const fullExplanation = item.fullExplanation || item.explanation;
-      const shouldExpand = index === 0 && String(item.importance || "").includes("최상");
       const details = [
         detailBlock("차근차근 이해하기", paragraphs(fullExplanation), "study-detail-full"),
         detailBlock("왜 중요한가", paragraphs(item.whyImportant)),
@@ -112,28 +120,30 @@
         detailBlock("OX로 점검하기", list(item.oxPoints, false, "study-ox-list"), "study-detail-full")
       ].join("");
       const meta = [item.unit, item.sourceFile].filter(Boolean).join(" · ");
-      return `<article id="${e(id)}" class="card study-card${shouldExpand ? " expanded" : ""}">
-        <header class="study-card-header">
+      return `<article id="${e(id)}" class="card study-card concept-detail-card">
+        <header class="study-card-header concept-detail-header">
           <div class="study-card-title">
-            <div class="study-card-badges">${SEStorage.rangeBadge(item.range || "공통")} ${importanceBadge(item.importance)}</div>
+            <div class="study-card-badges badges">${SEStorage.rangeBadge(item.range || "공통")} ${importanceBadge(item.importance)}</div>
             <h3>${e(title)}</h3>
-            ${meta ? `<p class="source"><span class="sr-only">출처: </span>${e(meta)}</p>` : ""}
+            ${meta ? `<p class="source source-file"><span class="sr-only">출처: </span>${e(meta)}</p>` : ""}
           </div>
-          <button class="study-expand-button" type="button" data-study-toggle aria-expanded="${shouldExpand}" aria-controls="${e(detailId)}"><span>${shouldExpand ? "상세 접기" : "상세 보기"}</span><i aria-hidden="true">＋</i></button>
         </header>
         <div class="study-card-intro">
           ${visualOf(item)}
-          <div class="study-summary">
-            <span class="eyebrow">핵심 요약</span>
+          <section class="study-summary concept-core-summary">
+            <h4>핵심 요약</h4>
             <p>${e(summaryOf(item, selected))}</p>
             ${comparisonPair(item, selected)}
-          </div>
+          </section>
         </div>
-        <div id="${e(detailId)}" class="study-detail"${shouldExpand ? "" : ' hidden=""'}>
+        <div class="study-toggle-row">
+          <button class="study-expand-button detail-toggle" type="button" data-study-toggle data-detail-toggle="${e(detailId)}" aria-expanded="false" aria-controls="${e(detailId)}"><span>상세 보기</span><i aria-hidden="true">＋</i></button>
+        </div>
+        <section id="${e(detailId)}" class="study-detail concept-deep-detail" hidden>
           <div class="study-detail-grid">${details}</div>
           ${item.tags && item.tags.length ? `<div class="study-tags" aria-label="연관 태그">${tags(item.tags)}</div>` : ""}
           <p class="origin-label study-source-basis"><strong>내용 기준</strong> · ${e(sourceBasis(item))}</p>
-        </div>
+        </section>
       </article>`;
     }
 
@@ -149,11 +159,10 @@
 
     function groupedHTML(items, selected) {
       const order = ["중간고사", "기말고사", "공통"];
-      let cardIndex = 0;
       return order.map((rangeName) => {
         const group = items.filter((item) => (item.range || "공통") === rangeName);
         if (!group.length) return "";
-        const cards = group.map((item) => cardHTML(item, selected, cardIndex++)).join("");
+        const cards = group.map((item) => cardHTML(item, selected)).join("");
         return `<section class="study-range-section" aria-labelledby="${rangeId(rangeName)}"><div id="${rangeId(rangeName)}" class="study-range-heading"><span class="eyebrow">${e(rangeName)} 범위</span><h2>${e(rangeName)} 학습 목록</h2><span>${group.length}개</span></div>${cards}</section>`;
       }).join("");
     }
@@ -233,7 +242,7 @@
       if (!detail) return;
       const expanded = button.getAttribute("aria-expanded") === "true";
       button.setAttribute("aria-expanded", String(!expanded));
-      button.querySelector("span").textContent = expanded ? "상세 보기" : "상세 접기";
+      button.querySelector("span").textContent = expanded ? "상세 보기" : "상세 닫기";
       detail.hidden = expanded;
       button.closest(".study-card").classList.toggle("expanded", !expanded);
     });
