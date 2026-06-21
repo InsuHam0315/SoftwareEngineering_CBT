@@ -1,7 +1,7 @@
 # PROJECT_STATUS
 
 ## 현재 단계
-- **CBT 중심 개편·검증·Git 준비 완료**
+- **CBT 중심 개편·검증·GitHub main 푸시 완료**
 - 최종 갱신: 2026-06-21 (Asia/Seoul)
 - 정식 사이트 제목: `2026 소프트웨어공학 기말고사 CBT 문제집`
 
@@ -21,7 +21,6 @@
 - Git 저장소 초기화, `main` 브랜치 설정, 대상 `origin` 연결, 사이트 파일만 스테이징
 
 ## 남은 작업
-- Git 커밋 및 원격 push
 - GitHub 저장소 Settings → Pages → Deploy from a branch → `main` → `/ (root)` 설정
 - 선택 사항: `ist-se.kro.kr` DNS 설정 후 CNAME 추가
 
@@ -58,10 +57,10 @@
 - 저장소: 초기화 완료
 - 브랜치: `main`
 - origin: `https://github.com/InsuHam0315/SoftwareEngineering_CBT.git`
-- 원격 상태: 커밋이 없는 빈 저장소
+- 최초 사이트 커밋: `7d5bd4e Build SoftwareEngineering CBT site`
 - `.gitignore`: `시험/`, `최종/`, 루트 대형 과제 파일, 참고 저장소, 레거시 중복 페이지 제외
-- 현재 상태: 사이트 산출물만 staged, 아직 commit/push하지 않음
-- push 보류 이유: `gh` CLI가 없고 비대화형 Git 자격 증명 사용 가능 여부를 확정할 수 없어 안전하게 명령만 제공
+- 원격 상태: `main` 브랜치를 `origin/main`으로 푸시 완료
+- 현재 상태: 로컬 `main`이 `origin/main`을 추적
 
 ## 실패 작업 및 원인
 - 사용자 설명의 루트 `중간고사/`, `기말고사/`가 없음: 실제 `시험/` 아래 위치를 사용해 해결
@@ -73,10 +72,8 @@
 1. `git status`
 2. `python scripts/validate_questions.py`
 3. `python scripts/validate_site.py`
-4. `git add .`
-5. `git commit -m "Build SoftwareEngineering CBT site"`
-6. `git push -u origin main`
-7. GitHub Pages를 `main` / `/ (root)`로 설정
+4. GitHub Pages를 `main` / `/ (root)`로 설정
+5. 배포 URL 접속 확인
 
 ## 재개 시 먼저 확인할 파일
 1. `PROJECT_STATUS.md`
