@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">스크럼 진행 흐름</title><desc id="desc">제품 백로그부터 스프린트 회고까지의 흐름</desc>
+  <defs><linearGradient id="bg" x2="1"><stop stop-color="#020617"/><stop offset="1" stop-color="#172554"/></linearGradient><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0v6l9-3z" fill="#22d3ee"/></marker></defs>
+  <rect width="1200" height="360" rx="28" fill="url(#bg)"/><text x="55" y="53" fill="#f8fafc" font-size="25" font-weight="700" font-family="sans-serif">Scrum 반복 주기</text><text x="55" y="82" fill="#94a3b8" font-size="15" font-family="sans-serif">검사와 적응을 반복해 제품 증분과 다음 백로그를 개선한다.</text>
+  <g font-family="sans-serif" text-anchor="middle" font-size="15" font-weight="700" fill="#e2e8f0" stroke-width="1.5">
+    <g stroke="#3b82f6" fill="#172554"><rect x="40" y="125" width="145" height="65" rx="15"/><text x="112" y="164">Product Backlog</text></g>
+    <g stroke="#6366f1" fill="#1e1b4b"><rect x="215" y="125" width="145" height="65" rx="15"/><text x="287" y="153">Sprint</text><text x="287" y="174">Planning</text></g>
+    <g stroke="#8b5cf6" fill="#2e1065"><rect x="390" y="125" width="145" height="65" rx="15"/><text x="462" y="164">Sprint Backlog</text></g>
+    <g stroke="#06b6d4" fill="#083344"><rect x="565" y="125" width="145" height="65" rx="15"/><text x="637" y="164">Sprint</text></g>
+    <g stroke="#14b8a6" fill="#042f2e"><rect x="565" y="235" width="145" height="65" rx="15"/><text x="637" y="274">Daily Scrum</text></g>
+    <g stroke="#10b981" fill="#064e3b"><rect x="740" y="125" width="145" height="65" rx="15"/><text x="812" y="153">Sprint</text><text x="812" y="174">Review</text></g>
+    <g stroke="#f59e0b" fill="#422006"><rect x="915" y="125" width="180" height="65" rx="15"/><text x="1005" y="153">Sprint</text><text x="1005" y="174">Retrospective</text></g>
+  </g>
+  <g stroke="#22d3ee" stroke-width="3" fill="none" marker-end="url(#a)"><path d="M190 157h17"/><path d="M365 157h17"/><path d="M540 157h17"/><path d="M715 157h17"/><path d="M890 157h17"/><path d="M637 228v-30"/><path d="M1005 202c0 125-718 125-718-4" stroke-dasharray="7 7"/></g>
+</svg>

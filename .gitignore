@@ -1,0 +1,45 @@
+# 읽기 전용 시험 원본 및 기존 과제 산출물
+/시험/
+/중간고사/
+/기말고사/
+/최종/
+
+# 프로젝트 루트에 남아 있는 기존 대형 과제 파일
+/*.pdf
+/*.pptx
+/*.xlsx
+/*.zip
+/*.mdj
+/*.png
+
+# 참고 저장소와 임시 검사 폴더
+/.reference-tmp/
+/linuxmaster-quiz/
+/ComputerNetwork_CBT/
+/_references/
+/.tmp/
+/tmp/
+
+# 이번 개편 전의 레거시 진입점과 중복 파일
+/compare.html
+/concepts.html
+/cram.html
+/mock-01.html
+/mock-02.html
+/notes.html
+/records.html
+/wrong-notes.html
+/assets/css/
+/assets/js/
+/data/mock01.js
+/data/mock02.js
+/data/notes.js
+/data/concepts.js
+/data/comparisons.js
+
+# 도구와 운영체제 캐시
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db
+.vscode/

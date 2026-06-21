@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="270" viewBox="0 0 1200 270" role="img" aria-labelledby="title desc">
+  <title id="title">소프트웨어 개발 생명주기 흐름</title><desc id="desc">요구사항 분석부터 유지보수까지의 순서</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0f172a"/><stop offset="1" stop-color="#111827"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity=".28"/></filter><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/></marker></defs>
+  <rect width="1200" height="270" rx="28" fill="url(#bg)"/><text x="54" y="52" fill="#f8fafc" font-size="25" font-weight="700" font-family="sans-serif">SDLC 핵심 흐름</text><text x="54" y="81" fill="#94a3b8" font-size="15" font-family="sans-serif">각 단계의 산출물은 다음 단계의 입력이 되며, 유지보수 결과는 새 요구사항으로 환류된다.</text>
+  <g filter="url(#s)" font-family="sans-serif" text-anchor="middle" font-size="17" font-weight="700">
+    <g fill="#172554" stroke="#3b82f6"><rect x="45" y="125" width="150" height="72" rx="16"/><text x="120" y="168" fill="#dbeafe">요구사항 분석</text></g>
+    <g fill="#1e1b4b" stroke="#6366f1"><rect x="235" y="125" width="120" height="72" rx="16"/><text x="295" y="168" fill="#e0e7ff">설계</text></g>
+    <g fill="#2e1065" stroke="#8b5cf6"><rect x="395" y="125" width="120" height="72" rx="16"/><text x="455" y="168" fill="#ede9fe">구현</text></g>
+    <g fill="#083344" stroke="#06b6d4"><rect x="555" y="125" width="120" height="72" rx="16"/><text x="615" y="168" fill="#cffafe">테스트</text></g>
+    <g fill="#064e3b" stroke="#10b981"><rect x="715" y="125" width="120" height="72" rx="16"/><text x="775" y="168" fill="#d1fae5">배포</text></g>
+    <g fill="#422006" stroke="#f59e0b"><rect x="875" y="125" width="150" height="72" rx="16"/><text x="950" y="168" fill="#fef3c7">유지보수</text></g>
+  </g>
+  <g stroke="#38bdf8" stroke-width="3" marker-end="url(#a)"><path d="M200 161h27"/><path d="M360 161h27"/><path d="M520 161h27"/><path d="M680 161h27"/><path d="M840 161h27"/><path d="M950 210 C950 245 120 245 120 208" fill="none" stroke-dasharray="7 7"/></g>
+</svg>

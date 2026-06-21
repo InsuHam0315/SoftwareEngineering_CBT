@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" role="img" aria-labelledby="title desc">
+  <title id="title">UML 관계 기호</title><desc id="desc">연관, 집합, 합성, 의존, 일반화, 실체화 관계 기호</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0f172a"/><stop offset="1" stop-color="#111827"/></linearGradient><marker id="open" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto"><path d="M1 1l10 5-10 5z" fill="#0f172a" stroke="#a5b4fc"/></marker><marker id="filled" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto"><path d="M1 1l10 5-10 5z" fill="#a5b4fc" stroke="#a5b4fc"/></marker><marker id="tri" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto"><path d="M1 1v10l10-5z" fill="#0f172a" stroke="#38bdf8"/></marker><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0v6l9-3" fill="none" stroke="#38bdf8"/></marker></defs>
+  <rect width="1200" height="500" rx="28" fill="url(#bg)"/><text x="55" y="55" fill="#f8fafc" font-size="25" font-weight="700" font-family="sans-serif">UML 관계 기호 한눈에 보기</text>
+  <g font-family="sans-serif"><g fill="#111827" stroke="#334155"><rect x="55" y="100" width="1090" height="340" rx="22"/></g>
+    <g fill="#f8fafc" font-weight="700" font-size="18"><text x="95" y="155">Association</text><text x="95" y="245">Aggregation</text><text x="95" y="335">Composition</text><text x="650" y="155">Dependency</text><text x="650" y="245">Generalization</text><text x="650" y="335">Realization</text></g>
+    <g fill="#94a3b8" font-size="14"><text x="95" y="180">연관 · 실선</text><text x="95" y="270">집합 · 빈 마름모</text><text x="95" y="360">합성 · 채운 마름모</text><text x="650" y="180">의존 · 점선 화살표</text><text x="650" y="270">일반화 · 실선 빈 삼각형</text><text x="650" y="360">실체화 · 점선 빈 삼각형</text></g>
+  </g>
+  <g stroke="#a5b4fc" stroke-width="3"><path d="M340 150h210"/><path d="M340 240h210" marker-end="url(#open)"/><path d="M340 330h210" marker-end="url(#filled)"/></g>
+  <g stroke="#38bdf8" stroke-width="3" fill="none"><path d="M900 150h200" stroke-dasharray="8 7" marker-end="url(#arrow)"/><path d="M900 240h200" marker-end="url(#tri)"/><path d="M900 330h200" stroke-dasharray="8 7" marker-end="url(#tri)"/></g>
+  <text x="55" y="475" fill="#64748b" font-size="14" font-family="sans-serif">기억법: 전체-부분 관계에서 부분의 독립 생명주기가 있으면 집합, 없으면 합성</text>
+</svg>
