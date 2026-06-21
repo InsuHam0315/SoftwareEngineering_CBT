@@ -21,6 +21,8 @@ DATASETS = {
 ABSOLUTE_WORDS = ("항상", "절대", "무조건", "반드시", "전혀")
 VAGUE_CHOICES = {"모두옳다", "모두맞다", "해당없다", "알수없다", "기타이다", "위와같다"}
 BANNED_PADDING = ("제시된 조건과 결과를 함께 고려", "관련 전제도 함께 확인", "을(를)", "표면적 특징만 보고 제시된 조건")
+DIRECT_CONCEPT_TAG = "직접 개념형"
+SCENARIO_STEMS = ("가장 적절한 대응", "우선 조치", "책임 있는 결정", "릴리스 결정", "재발 방지 활동")
 
 
 def load_js(path: Path) -> list[dict]:
@@ -55,6 +57,7 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
     absolute_count = 0
     imbalanced_count = 0
     extreme_imbalance_count = 0
+    direct_concept_count = 0
 
     if len(questions) != 50:
         errors.append(f"{label}: 문항 수 {len(questions)} (기대 50)")
@@ -96,6 +99,14 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
             continue
         if not isinstance(item["tags"], list) or not item["tags"] or any(not isinstance(tag, str) or not tag.strip() for tag in item["tags"]):
             errors.append(f"{where}: tags가 비어 있거나 올바르지 않음")
+        elif label.startswith("final"):
+            if DIRECT_CONCEPT_TAG not in item["tags"]:
+                errors.append(f"{where}: 직접 개념형 태그가 없음")
+            else:
+                direct_concept_count += 1
+            scenario_phrase = next((phrase for phrase in SCENARIO_STEMS if phrase in item["question"]), None)
+            if scenario_phrase:
+                errors.append(f"{where}: 복잡한 상황판단형 표현 '{scenario_phrase}'")
         if len(item["explanation"].strip()) < 35:
             errors.append(f"{where}: 해설이 너무 짧아 정답 근거와 함정을 설명하기 어려움")
         if "시험 포인트:" not in item["explanation"]:
@@ -156,7 +167,8 @@ def validate_set(label: str, questions: list[dict], expected_exam: str) -> tuple
 
     stats = {"ranges": ranges, "answers": answers, "difficulties": difficulties, "longest_ratio": ratio,
              "average_ratio": average_ratio, "absolute_count": absolute_count, "simple_stems": simple_stems,
-             "imbalanced_count": imbalanced_count, "extreme_imbalance_count": extreme_imbalance_count}
+             "imbalanced_count": imbalanced_count, "extreme_imbalance_count": extreme_imbalance_count,
+             "direct_concept_count": direct_concept_count}
     return errors, stats
 
 
@@ -208,6 +220,8 @@ def main() -> int:
         print(f"{label}: {len(questions)}문항 | 정답 " + ", ".join(f"{n}={stats['answers'][n]}" for n in range(1, 5)))
         print(f"  난이도 {dict(stats['difficulties'])} | 단독 최장 정답 {stats['longest_ratio']:.0%} | 평균 길이비 {stats['average_ratio']:.2f}")
         print(f"  선지 길이비 0.60 미만 {stats['imbalanced_count']}문항 | 0.35 미만 {stats['extreme_imbalance_count']}문항")
+        if label.startswith("final"):
+            print(f"  직접 개념형 {stats['direct_concept_count']}문항")
         for item in questions:
             item_id = item.get("id")
             if item_id in global_ids:

@@ -27,7 +27,7 @@ REQUIRED = HTML_FILES + [
     "data/software_engineering_mock_01.js", "data/software_engineering_mock_02.js", "data/software_engineering_final_bank.js",
     *[f"data/software_engineering_final_set_{n:02d}.js" for n in range(1, FINAL_SET_COUNT + 1)],
     "data/software_engineering_notes.js", "data/software_engineering_concepts.js", "data/software_engineering_comparisons.js",
-    "scripts/validate_questions.py", "scripts/validate_site.py", "scripts/generate_concept_svgs.py",
+    "scripts/validate_questions.py", "scripts/validate_site.py", "scripts/generate_concept_svgs.py", "scripts/generate_final_sets.js",
 ]
 GLOBALS = {
     "data/software_engineering_mock_01.js": "window.SE_MOCK_01",
