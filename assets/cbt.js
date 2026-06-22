@@ -15,6 +15,7 @@
     const configs = {
       mock01: { data: window.SE_MOCK_01, label: "모의고사 1회" },
       mock02: { data: window.SE_MOCK_02, label: "모의고사 2회" },
+      mock03: { data: window.SE_MOCK_03, label: "모의고사 3회" },
       "final-set-01": { data: window.SE_FINAL_SET_01, label: "기말 CBT 1세트" },
       "final-set-02": { data: window.SE_FINAL_SET_02, label: "기말 CBT 2세트" },
       "final-set-03": { data: window.SE_FINAL_SET_03, label: "기말 CBT 3세트" },
@@ -37,32 +38,42 @@
     const allSource = randomSource.map((question) => ({ ...question }));
     let filteredSource = allSource.slice();
     let questions = filteredSource.map((question) => ({ ...question, displayChoices: choiceObjects(question) }));
+    let gradingMode = "single";
     const states = new Map(); let savedSignature = "";
     const list = document.getElementById("question-list"); const palette = document.getElementById("question-palette"); const live = document.getElementById("cbt-live");
     const e = SEStorage.escapeHTML; const stateOf = (id) => states.get(id) || { selected: null, confirmed: false, correct: false };
 
+    function buildStudyControls() {
+      const summary = app.querySelector(".card"); const actions = summary?.querySelector(".actions"); const submit = app.querySelector(".floating-submit");
+      if (!actions || !submit) return;
+      actions.insertAdjacentHTML("afterend", '<div class="cbt-controls"><div class="grading-control"><span class="control-label">채점 방식</span><div class="grading-mode" role="group" aria-label="채점 방식"><button class="mode-button active" id="grading-single" type="button" aria-pressed="true">문제별 확인</button><button class="mode-button" id="grading-batch" type="button" aria-pressed="false">전체 채점</button></div></div><div class="subject-filter"><label class="control-label" for="bank-topic">과목(주제)</label><select class="select" id="bank-topic"><option value="">전체 과목</option></select><button class="btn btn-sm" id="apply-bank-filter" type="button">과목 적용</button></div></div>');
+      submit.insertAdjacentHTML("afterbegin", '<button class="btn btn-primary" id="submit-all" type="button" hidden>전체 답안 채점</button>');
+    }
     function buildFilterOptions() {
       const topic = document.getElementById("bank-topic"); const tag = document.getElementById("bank-tag");
-      if (!topic || !tag) return;
+      if (!topic) return;
       const topics = [...new Set(allSource.map((item) => item.topic))].sort((a, b) => a.localeCompare(b, "ko"));
-      const tags = [...new Set(allSource.flatMap((item) => item.tags || []))].sort((a, b) => a.localeCompare(b, "ko"));
-      topic.innerHTML = '<option value="">전체 주제</option>' + topics.map((value) => `<option value="${e(value)}">${e(value)}</option>`).join("");
-      tag.innerHTML = '<option value="">전체 태그</option>' + tags.map((value) => `<option value="${e(value)}">#${e(value)}</option>`).join("");
+      topic.innerHTML = '<option value="">전체 과목</option>' + topics.map((value) => `<option value="${e(value)}">${e(value)}</option>`).join("");
+      if (tag) {
+        const tags = [...new Set(allSource.flatMap((item) => item.tags || []))].sort((a, b) => a.localeCompare(b, "ko"));
+        tag.innerHTML = '<option value="">전체 태그</option>' + tags.map((value) => `<option value="${e(value)}">#${e(value)}</option>`).join("");
+      }
     }
     function applyFilters() {
-      if ([...states.values()].some((state) => state.confirmed) && !window.confirm("필터를 바꾸면 현재 풀이 상태가 초기화됩니다. 계속할까요?")) return;
+      if ([...states.values()].some((state) => state.selected) && !window.confirm("필터를 바꾸면 현재 풀이 상태가 초기화됩니다. 계속할까요?")) return;
       const range = document.getElementById("bank-range")?.value || ""; const topic = document.getElementById("bank-topic")?.value || ""; const tag = document.getElementById("bank-tag")?.value || "";
       filteredSource = allSource.filter((item) => (!range || item.range === range) && (!topic || item.topic === topic) && (!tag || (item.tags || []).includes(tag)));
       questions = filteredSource.map((question) => ({ ...question, displayChoices: choiceObjects(question) })); states.clear(); savedSignature = ""; draw();
-      live.textContent = filteredSource.length ? `${filteredSource.length}문항으로 문제집을 구성했습니다.` : "조건에 맞는 문제가 없습니다.";
+      live.textContent = filteredSource.length ? `${topic || "전체 과목"} ${filteredSource.length}문항으로 문제집을 구성했습니다.` : "선택한 과목에 해당하는 문제가 없습니다.";
     }
     function counts() {
       const values = [...states.values()]; const confirmed = values.filter((state) => state.confirmed).length; const correct = values.filter((state) => state.confirmed && state.correct).length;
       return { confirmed, correct, selected: values.filter((state) => state.selected).length };
     }
     function paintStats() {
-      const { confirmed, correct } = counts(); const total = questions.length; const progress = total ? Math.round(confirmed / total * 100) : 0;
-      document.getElementById("cbt-total").textContent = `${total}문항`; document.getElementById("confirmed-count").textContent = `${confirmed} / ${total}`;
+      const { confirmed, correct, selected } = counts(); const total = questions.length; const completed = gradingMode === "batch" ? selected : confirmed; const progress = total ? Math.round(completed / total * 100) : 0;
+      const completion = document.getElementById("confirmed-count"); const completionLabel = completion.parentElement.querySelector("span");
+      document.getElementById("cbt-total").textContent = `${total}문항`; completion.textContent = `${completed} / ${total}`; completionLabel.textContent = gradingMode === "batch" ? "답변 완료" : "확인 완료";
       document.getElementById("correct-count").textContent = `${correct}문항`; document.getElementById("current-score").textContent = confirmed ? `${Math.round(correct / confirmed * 100)}점` : "0점";
       document.getElementById("progress-percent").textContent = `${progress}%`; document.getElementById("cbt-progress").style.width = `${progress}%`;
     }
@@ -78,7 +89,8 @@
     function questionHTML(question, index) {
       const state = stateOf(question.id); const correctDisplay = question.displayChoices.findIndex((option) => option.originalIndex === question.answer) + 1;
       const result = state.confirmed ? `<div class="question-result ${state.correct ? "correct" : "wrong"}" role="status"><strong>${state.correct ? "정답입니다." : "오답입니다."}</strong><p><b>현재 표시 기준 정답:</b> ${correctDisplay}번 · ${e(question.choices[question.answer - 1])}</p><p>${e(question.explanation)}</p></div>` : "";
-      return `<article class="card question-card" id="q-${e(question.id)}"><header><div><span class="question-number">문제 ${index + 1}</span> <span class="source">원본 ID ${e(question.id)}</span></div><div>${SEStorage.rangeBadge(question.range)} <span class="badge mid">${e(question.difficulty)}</span></div></header><div class="question-text">${e(question.question)}</div><div class="choices">${question.displayChoices.map((option, displayIndex) => `<button class="choice ${choiceClass(option, state, question.answer)}" type="button" data-id="${e(question.id)}" data-choice="${option.originalIndex}" ${state.confirmed ? "disabled" : ""}><span class="choice-index">${displayIndex + 1}</span><span>${e(option.text)}</span></button>`).join("")}</div><div class="question-actions"><button class="btn btn-primary confirm-answer" data-id="${e(question.id)}" type="button" ${state.confirmed ? "disabled" : ""}>${state.confirmed ? "확인 완료" : "확인"}</button></div>${result}<div class="source">주제: ${e(question.topic)} · 출처: ${e(question.sourceFile)} · ${SEStorage.tags(question.tags)}</div></article>`;
+      const confirm = gradingMode === "single" ? `<div class="question-actions"><button class="btn btn-primary confirm-answer" data-id="${e(question.id)}" type="button" ${state.confirmed ? "disabled" : ""}>${state.confirmed ? "확인 완료" : "확인"}</button></div>` : "";
+      return `<article class="card question-card" id="q-${e(question.id)}"><header><div><span class="question-number">문제 ${index + 1}</span> <span class="source">원본 ID ${e(question.id)}</span></div><div>${SEStorage.rangeBadge(question.range)} <span class="badge mid">${e(question.difficulty)}</span></div></header><div class="question-text">${e(question.question)}</div><div class="choices">${question.displayChoices.map((option, displayIndex) => `<button class="choice ${choiceClass(option, state, question.answer)}" type="button" data-id="${e(question.id)}" data-choice="${option.originalIndex}" ${state.confirmed ? "disabled" : ""}><span class="choice-index">${displayIndex + 1}</span><span>${e(option.text)}</span></button>`).join("")}</div>${confirm}${result}<div class="source">주제: ${e(question.topic)} · 출처: ${e(question.sourceFile)} · ${SEStorage.tags(question.tags)}</div></article>`;
     }
     function draw() {
       list.innerHTML = questions.length ? questions.map(questionHTML).join("") : '<div class="empty">선택한 조건에 해당하는 문제가 없습니다.</div>'; drawPalette(); paintStats();
@@ -96,6 +108,31 @@
       live.textContent = next.correct ? "정답으로 확인했습니다." : "오답으로 확인해 오답노트에 저장했습니다."; if (!next.correct) saveWrong(question, next, displayedQuestion); draw();
       if (questions.length && counts().confirmed === questions.length) saveRecord(true);
     }
+    function submitAll() {
+      if (!questions.length) { live.textContent = "채점할 문제가 없습니다."; return; }
+      const unanswered = questions.filter((question) => !stateOf(question.id).selected);
+      if (unanswered.length) {
+        live.textContent = `${unanswered.length}문항이 남아 있습니다. 모두 답변한 뒤 전체 채점해 주세요.`;
+        document.getElementById(`q-${unanswered[0].id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      questions.forEach((question) => {
+        const state = stateOf(question.id); const next = { ...state, confirmed: true, correct: state.selected === question.answer };
+        states.set(question.id, next);
+        if (!state.confirmed && !next.correct) saveWrong(question, next, question);
+      });
+      draw(); saveRecord(true);
+    }
+    function setGradingMode(mode) {
+      gradingMode = mode;
+      app.querySelectorAll(".mode-button").forEach((button) => {
+        const active = button.id === `grading-${mode}`; button.classList.toggle("active", active); button.setAttribute("aria-pressed", String(active));
+      });
+      document.getElementById("submit-all").hidden = mode !== "batch";
+      document.getElementById("save-record").hidden = mode === "batch";
+      draw();
+      live.textContent = mode === "batch" ? "모든 문제에 답한 뒤 아래의 전체 답안 채점을 눌러 주세요." : "각 문제의 확인 버튼으로 바로 정답과 해설을 볼 수 있습니다.";
+    }
     function saveRecord(automatic) {
       const { confirmed, correct } = counts(); const total = questions.length;
       if (!confirmed || !total) { live.textContent = "확인한 문제가 없어 기록을 저장할 수 없습니다."; return; }
@@ -109,12 +146,16 @@
       const current = new Map(questions.map((question) => [question.id, question])); questions = filteredSource.map((question) => current.get(question.id) || { ...question, displayChoices: choiceObjects(question) }); draw(); live.textContent = "문제를 기본 순서로 복원했습니다.";
     }
 
+    buildStudyControls();
     document.getElementById("random-order").addEventListener("click", () => { questions = shuffle(questions); draw(); live.textContent = "문제 표시 순서를 섞었습니다. 원본 ID와 풀이 상태는 유지됩니다."; });
     document.getElementById("restore-order").addEventListener("click", restoreOrder);
     document.getElementById("random-choices").addEventListener("click", () => { questions.forEach((question) => { question.displayChoices = shuffle(question.displayChoices); }); draw(); live.textContent = "선지 순서를 섞었습니다. 원본 정답 인덱스로 안전하게 채점합니다."; });
     document.getElementById("restore-choices").addEventListener("click", () => { questions.forEach((question) => { question.displayChoices = choiceObjects(question); }); draw(); live.textContent = "선지를 기본 순서로 복원했습니다."; });
     document.getElementById("save-record").addEventListener("click", () => saveRecord(false));
-    document.getElementById("apply-bank-filter")?.addEventListener("click", applyFilters);
+    document.getElementById("submit-all").addEventListener("click", submitAll);
+    document.getElementById("grading-single").addEventListener("click", () => setGradingMode("single"));
+    document.getElementById("grading-batch").addEventListener("click", () => setGradingMode("batch"));
+    document.getElementById("apply-bank-filter").addEventListener("click", applyFilters);
     buildFilterOptions(); draw();
     if (retryId) setTimeout(() => document.getElementById(`q-${retryId}`)?.scrollIntoView({ behavior: "smooth" }), 120);
   });

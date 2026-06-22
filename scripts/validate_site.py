@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FINAL_SET_COUNT = 10
 HTML_FILES = [
     "index.html", "login.html",
-    "cbt/software_engineering_mock_01.html", "cbt/software_engineering_mock_02.html", "cbt/software_engineering_final_cbt.html",
+    "cbt/software_engineering_mock_01.html", "cbt/software_engineering_mock_02.html", "cbt/software_engineering_mock_03.html", "cbt/software_engineering_final_cbt.html",
     *[f"cbt/software_engineering_final_set_{n:02d}.html" for n in range(1, FINAL_SET_COUNT + 1)],
     "cbt/software_engineering_final_random.html",
     "notes/software-engineering-final/index.html", "review/wrong-notes.html", "stats/study-record.html",
@@ -24,7 +24,7 @@ REQUIRED = HTML_FILES + [
     "README.md", "PROJECT_STATUS.md", ".gitignore", ".nojekyll",
     "assets/style.css", "assets/storage.js", "assets/auth.js", "assets/cbt.js", "assets/review.js", "assets/stats.js", "assets/notes.js",
     "assets/img/sdlc-flow.svg", "assets/img/scrum-flow.svg", "assets/img/uml-relations.svg", "assets/img/testing-flow.svg",
-    "data/software_engineering_mock_01.js", "data/software_engineering_mock_02.js", "data/software_engineering_final_bank.js",
+    "data/software_engineering_mock_01.js", "data/software_engineering_mock_02.js", "data/software_engineering_mock_03.js", "data/software_engineering_final_bank.js",
     *[f"data/software_engineering_final_set_{n:02d}.js" for n in range(1, FINAL_SET_COUNT + 1)],
     "data/software_engineering_notes.js", "data/software_engineering_concepts.js", "data/software_engineering_comparisons.js",
     "scripts/validate_questions.py", "scripts/validate_site.py", "scripts/generate_concept_svgs.py", "scripts/generate_final_sets.js",
@@ -32,6 +32,7 @@ REQUIRED = HTML_FILES + [
 GLOBALS = {
     "data/software_engineering_mock_01.js": "window.SE_MOCK_01",
     "data/software_engineering_mock_02.js": "window.SE_MOCK_02",
+    "data/software_engineering_mock_03.js": "window.SE_MOCK_03",
     "data/software_engineering_final_bank.js": "window.SE_FINAL_BANK",
     **{f"data/software_engineering_final_set_{n:02d}.js": f"window.SE_FINAL_SET_{n:02d}" for n in range(1, FINAL_SET_COUNT + 1)},
     "data/software_engineering_notes.js": "window.SE_NOTES",
@@ -190,10 +191,16 @@ def main() -> int:
     for marker in ["softwareEngineeringCurrentUser", "softwareEngineeringUsers", "softwareEngineeringStudyData_"]:
         if marker not in storage: errors.append(f"assets/storage.js: localStorage 키 표식 없음 '{marker}'")
     cbt = (ROOT / "assets/cbt.js").read_text(encoding="utf-8-sig") if (ROOT / "assets/cbt.js").exists() else ""
-    for marker in ["confirm-answer", "random-order", "restore-order", "random-choices", "upsertWrongNote", "addRecord", "bank-range", "bank-topic", "bank-tag"]:
+    for marker in ["confirm-answer", "grading-batch", "submit-all", "random-order", "restore-order", "random-choices", "upsertWrongNote", "addRecord", "apply-bank-filter", "bank-range", "bank-topic", "bank-tag"]:
         if marker not in cbt: errors.append(f"assets/cbt.js: CBT 기능 표식 없음 '{marker}'")
     index = (ROOT / "index.html").read_text(encoding="utf-8-sig") if (ROOT / "index.html").exists() else ""
     if "2026 소프트웨어공학 기말고사 CBT 문제집" not in index: errors.append("index.html: 정확한 사이트 제목 없음")
+    for n in range(1, 4):
+        link = f"cbt/software_engineering_mock_{n:02d}.html"
+        if link not in index: errors.append(f"index.html: 모의고사 {n}회 링크 없음")
+        mock_page = (ROOT / link).read_text(encoding="utf-8-sig") if (ROOT / link).exists() else ""
+        if f'data-bank="mock0{n}"' not in mock_page: errors.append(f"모의고사 {n}회: data-bank 설정 오류")
+        if f"software_engineering_mock_{n:02d}.js" not in mock_page: errors.append(f"모의고사 {n}회: 데이터 파일 연결 없음")
     for n in range(1, FINAL_SET_COUNT + 1):
         link = f"cbt/software_engineering_final_set_{n:02d}.html"
         if link not in index: errors.append(f"index.html: 기말 CBT {n}세트 링크 없음")
@@ -230,7 +237,7 @@ def main() -> int:
     print(f"[통과] 필수 파일 {len(REQUIRED)}개와 정식 HTML {len(HTML_FILES)}개 확인")
     print("[통과] GitHub Pages 상대경로·로컬 이미지·SVG·전역 데이터 확인")
     print("[통과] 학습 카드별 로컬 visual·오른쪽 목차·상세 렌더링 표식 확인")
-    print("[통과] 새 localStorage 키·CBT 확인 채점·랜덤·필터 기능 표식 확인")
+    print("[통과] 새 localStorage 키·CBT 문제별/전체 채점·랜덤·과목 필터 기능 표식 확인")
     print("[통과] 참고 저장소 파일이 산출물에 포함되지 않음")
     return 0
 

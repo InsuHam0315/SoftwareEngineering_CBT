@@ -16,6 +16,7 @@ REQUIRED = ["id", "exam", "range", "sourceFolder", "sourceFile", "topic", "type"
 DATASETS = {
     "mock01": ("software_engineering_mock_01.js", "window.SE_MOCK_01", "mock01"),
     "mock02": ("software_engineering_mock_02.js", "window.SE_MOCK_02", "mock02"),
+    "mock03": ("software_engineering_mock_03.js", "window.SE_MOCK_03", "mock03"),
     **{f"final_set_{n:02d}": (f"software_engineering_final_set_{n:02d}.js", f"window.SE_FINAL_SET_{n:02d}", f"final-set-{n:02d}") for n in range(1, FINAL_SET_COUNT + 1)},
 }
 ABSOLUTE_WORDS = ("항상", "절대", "무조건", "반드시", "전혀")

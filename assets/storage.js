@@ -55,7 +55,7 @@
     const header = document.getElementById("site-header"); const base = basePath();
     if (header) {
       const links = [
-        ["index.html", "홈"], ["cbt/software_engineering_mock_01.html", "모의 1회"], ["cbt/software_engineering_mock_02.html", "모의 2회"],
+        ["index.html", "홈"], ["cbt/software_engineering_mock_01.html", "모의 1회"], ["cbt/software_engineering_mock_02.html", "모의 2회"], ["cbt/software_engineering_mock_03.html", "모의 3회"],
         ["cbt/software_engineering_final_cbt.html", "기말 세트"], ["review/wrong-notes.html", "오답노트"],
         ["stats/study-record.html", "학습기록"], ["notes/software-engineering-final/index.html", "개념정리"]
       ];

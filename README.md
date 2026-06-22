@@ -1,11 +1,12 @@
 # 2026 소프트웨어공학 기말고사 CBT 문제집
 
-제공된 소프트웨어공학 중간·기말고사 자료를 바탕으로 만든 정적 CBT 학습 사이트입니다. 쉬움·보통 중심 모의고사 2회, 기말 CBT 50문항 10세트, 랜덤 50문항, 오답노트, 사용자별 학습기록과 보조 개념정리를 제공합니다.
+제공된 소프트웨어공학 중간·기말고사 자료를 바탕으로 만든 정적 CBT 학습 사이트입니다. 쉬움·보통 중심 모의고사 3회, 기말 CBT 50문항 10세트, 랜덤 50문항, 오답노트, 사용자별 학습기록과 보조 개념정리를 제공합니다.
 
 ## 주요 기능
 
 - 모의고사별 50문항: 중간고사 범위 15문항, 기말고사 범위 35문항
-- 선지 선택 후 `확인` 버튼으로 채점
+- 문제별 `확인` 또는 전 문항 풀이 후 `전체 채점`
+- 과목(주제)별 문제 필터
 - 문제 번호 팔레트와 진행률·정답률 표시
 - 문제 순서 및 선지 순서 랜덤
 - 기말 CBT 50문항 10세트와 전체 500문항 기반 랜덤 50문항
@@ -27,12 +28,14 @@
 ├─ cbt/
 │  ├─ software_engineering_mock_01.html
 │  ├─ software_engineering_mock_02.html
+│  ├─ software_engineering_mock_03.html
 │  ├─ software_engineering_final_cbt.html
 │  ├─ software_engineering_final_set_01.html ~ final_set_10.html
 │  └─ software_engineering_final_random.html
 ├─ data/
 │  ├─ software_engineering_mock_01.js
 │  ├─ software_engineering_mock_02.js
+│  ├─ software_engineering_mock_03.js
 │  ├─ software_engineering_final_bank.js
 │  ├─ software_engineering_final_set_01.js ~ final_set_10.js
 │  ├─ software_engineering_notes.js

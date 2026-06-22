@@ -135,3 +135,21 @@ body.light .study-related-list li{color:#475569}
   .study-compare-vs{text-align:center}
   .study-toc-mobile .study-toc-sub{grid-template-columns:1fr}
 }
+
+.cbt-controls{display:grid;grid-template-columns:minmax(280px,1fr) minmax(360px,1.5fr);gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.grading-control,.subject-filter{display:flex;align-items:center;gap:9px;min-width:0}
+.control-label{flex:0 0 auto;color:var(--muted);font-size:.82rem;font-weight:800}
+.grading-mode{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:12px;background:rgba(15,23,42,.35)}
+.mode-button{padding:.48rem .72rem;border:0;border-radius:9px;background:transparent;color:var(--muted);font-weight:800}
+.mode-button.active{background:#2563eb;color:#fff}
+.subject-filter .select{flex:1;min-width:0}
+.floating-submit{gap:9px}
+.floating-submit [hidden]{display:none}
+
+@media(max-width:760px){
+  .cbt-controls{grid-template-columns:1fr}
+  .grading-control,.subject-filter{align-items:stretch;flex-direction:column}
+  .control-label{align-self:flex-start}
+  .grading-mode,.subject-filter .select,.subject-filter .btn{width:100%}
+  .mode-button{flex:1}
+}

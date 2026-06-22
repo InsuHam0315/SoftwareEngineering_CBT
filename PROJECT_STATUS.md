@@ -12,7 +12,7 @@
   - 개념명을 보고 기본 정의 찾기
   - 비슷한 개념의 핵심 구분 확인하기
   - 짧은 대표 예 또는 기억법 확인하기
-- 모의고사 1·2회는 이전에 복구한 쉬움·보통 중심 문항을 그대로 유지했다.
+- 모의고사 1·2회는 이전 문항을 유지하고, 같은 구성의 신규 모의고사 3회를 추가했다.
 - 기말 문항 ID는 내용 교체에 맞춰 `final-concept-XX-XXX` 형식으로 새로 부여해 과거 문항과 혼동되지 않게 했다.
 
 ## 세트별 검증 결과
@@ -20,6 +20,7 @@
 |---|---:|---|---|---:|---:|
 | 모의고사 1회 | 50 | 17 / 27 / 6 | 13 / 12 / 13 / 12 | 24% | - |
 | 모의고사 2회 | 50 | 16 / 28 / 6 | 12 / 13 / 12 / 13 | 34% | - |
+| 모의고사 3회 | 50 | 17 / 27 / 6 | 13 / 12 / 13 / 12 | 20% | - |
 | 기말 CBT 1세트 | 50 | 18 / 27 / 5 | 13 / 13 / 12 / 12 | 26% | 50 |
 | 기말 CBT 2세트 | 50 | 18 / 27 / 5 | 12 / 13 / 13 / 12 | 26% | 50 |
 | 기말 CBT 3세트 | 50 | 18 / 27 / 5 | 12 / 12 / 13 / 13 | 26% | 50 |
@@ -38,27 +39,27 @@
 - 모든 문항 해설에 정답 근거, 다른 개념과의 구분, `시험 포인트:`를 포함했다.
 
 ## 50문항 반복 학습 구조
-- 모의고사 1·2회는 각각 50문항이다.
+- 모의고사 1~3회는 각각 50문항이다.
 - 기말 CBT는 10세트, 세트별 50문항으로 총 500문항이다.
 - 랜덤 CBT는 기말 500문항에서 50문항만 추출하며 100문항 기본 세션은 사용하지 않는다.
-- 로그인, 학습기록, 오답노트, 문제 번호 팔레트, 문제·선지 랜덤, 확인 버튼 채점 기능을 유지했다.
+- 로그인, 학습기록, 오답노트, 문제 번호 팔레트, 문제·선지 랜덤, 문제별·전체 채점 기능을 유지했다.
 
 ## 수정 파일
 - 문서·진입: `README.md`, `index.html`, `PROJECT_STATUS.md`
-- CBT 안내: `cbt/software_engineering_final_cbt.html`, `cbt/software_engineering_final_set_01.html`~`10.html`
-- 문제 데이터: `data/software_engineering_final_set_01.js`~`10.js`
+- CBT 안내: `cbt/software_engineering_mock_03.html`, `cbt/software_engineering_final_cbt.html`, `cbt/software_engineering_final_set_01.html`~`10.html`
+- 문제 데이터: `data/software_engineering_mock_03.js`, `data/software_engineering_final_set_01.js`~`10.js`
 - 생성기: `scripts/generate_final_sets.js` (`generate_extra_sets.js`에서 역할에 맞게 변경)
 - 검증기: `scripts/validate_questions.py`, `scripts/validate_site.py`
 
 ## 검증 결과
 - `python scripts/validate_questions.py`: **통과**
-  - 12개 세트, 총 600문항 구조·분포·난이도·선지 편향 확인
+  - 13개 세트, 총 650문항 구조·분포·난이도·선지 편향 확인
   - 기말 500문항 모두 `직접 개념형` 태그 확인
   - 완전 중복 0건, 유사도 0.90 이상은 반복 학습용 표현 34쌍 보고
 - `python scripts/validate_site.py`: **통과**
-  - 필수 파일 54개, 정식 HTML 19개, 상대경로와 기능 표식 확인
+  - 필수 파일 56개, 정식 HTML 20개, 상대경로와 기능 표식 확인
   - 원본 18개 SHA-256 무결성 확인
-- `node --check`: **통과** — 기능·데이터·생성기 JS 19개
+- `node --check`: **통과** — 기능·데이터·생성기 JS 20개
 - Python 구문 검사: **통과** — 검증기 2개
 - 런타임 데이터 검사: **통과** — 기말 500문항 모두 직접 개념형
 - HTTP 확인: **통과** — 정식 화면 19개 모두 200 및 한국어 문서
